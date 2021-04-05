@@ -1,0 +1,27 @@
+{
+	"name": "koreanswarm",
+	"version": "1.0.0",
+	"main": "lib/index",
+	"license": "none",
+	"private": true,
+	"scripts": {
+		"test": "npx nslibmgr test",
+		"start": "node lib/cli"
+	},
+	"dependencies": {
+		"antiangular": "^0.0.22",
+		"dodgy-kebab": "^0.2.5",
+		"doge-config": "^0.0.1",
+		"doge-utils": "^0.0.9",
+		"dogehouse.js": "^2.0.2"
+	},
+	"devDependencies": {
+		"@types/node": "^14.14.37"
+	},
+	"bin": {
+		"koreanswarm": "lib/cli.js"
+	},
+	"keywords": [],
+	"author": "",
+	"description": ""
+}
