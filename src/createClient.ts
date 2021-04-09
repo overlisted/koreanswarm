@@ -1,5 +1,4 @@
-/* import { Client } from "dogehouse.js"; */
-import { raw, wrap } from "dodgy-kebab";
+import { raw, wrap } from "@dogehouse/kebab";
 
 const createClient = async ({
   token,
