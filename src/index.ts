@@ -1,11 +1,9 @@
 import createClient from "./createClient";
 import accounts from "./accounts";
-import { Wrapper as Client } from "@dogehouse/kebab";
 import { format } from "doge-utils";
 import { readFile } from "fs/promises";
 import sleep from "./sleep";
 import log from "./log";
-import { loadavg } from "node:os";
 
 let kill: Function;
 let death: Promise<void> = new Promise((resolve) => (kill = resolve));
