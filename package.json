@@ -9,7 +9,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@dogehouse/kebab": "^0.2.4",
+    "@dogehouse/kebab": "^0.2.6",
     "doge-config": "^0.0.1",
     "doge-utils": "^0.0.9",
     "typescript": "^4.2.3"

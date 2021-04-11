@@ -1,62 +1,83 @@
 import createClient from "./createClient";
 import accounts from "./accounts";
 import { format } from "doge-utils";
-import { readFile } from "fs/promises";
 import sleep from "./sleep";
 import log from "./log";
+import { tokensToString } from "@dogehouse/kebab";
+import { writeFile, readFile } from "fs/promises";
+import ClientSwarm from "./ClientSwarm";
 
 let kill: Function;
 let death: Promise<void> = new Promise((resolve) => (kill = resolve));
 
 const main = async () => {
-  let currentLog = "";
   try {
-    log.load("Loading text");
-
-    const script = (await readFile("./config/script.txt", "utf-8")).split("\n");
-
-    log.done();
     log.load("Loading accounts");
 
-    const clients = await Promise.all(
-      accounts.map((account) => createClient(account))
+    const swarm = new ClientSwarm(
+      await Promise.all(accounts.map((account) => createClient(account)))
     );
 
     log.done();
     log.load("Creating room");
 
-    const info = await clients[0].mutation.createRoom({
-      name: "🐝 Bee swarm simulator 🐝",
+    await swarm.createRoom({
+      name: "FizzBuzz 0 - 1 000 000 (do !speak to speak)",
       privacy: "public",
-      description:
-        "Satire; if you want me to stop, say it in the Discord server (#dogehouse)",
+      description: "yes",
     });
 
-    if ("error" in info) throw "room fail";
+    log.done();
+    log.load("Going to speakers");
+
+    await swarm.speak();
 
     log.done();
-    log.load("Joining room");
+    log.load("Subscribing to messages");
 
-    const { room } = info;
+    swarm.first.subscribe.newChatMsg(({ userId, msg }) => {
+      console.log(`${msg.username}: ${tokensToString(msg.tokens)}`);
+      if (tokensToString(msg.tokens) === "!speak")
+        swarm.first.mutation.addSpeaker(userId);
+    });
 
-    await Promise.all(
-      clients.map((client) => client.query.joinRoomAndGetInfo(room.id))
-    );
+    log.done();
+    log.load("Loading autosave");
+
+    let fi = parseInt(await readFile("./config/progress.txt", "utf-8"));
+    if (isNaN(fi)) fi = 0;
 
     log.done();
 
-    let scriptIndex = 0;
-
-    while (true)
-      for (const i in clients) {
-        const client = clients[i];
-        if (!script[scriptIndex]) scriptIndex = 0;
-        client.mutation.sendRoomChatMsg(format(script[scriptIndex]));
-        scriptIndex++;
-        await sleep(1000 / clients.length);
+    while (fi <= 1000000) {
+      swarm.first.mutation.editRoom({
+        name: `FizzBuzz - ${fi} / 1 000 000 (do !speak to speak)`,
+        privacy: "public",
+        description: "yes",
+      });
+      writeFile("./config/progress.txt", fi.toString());
+      console.log("\nUpdated room info\n");
+      for (const i in swarm.clients) {
+        const client = swarm.clients[i];
+        let msg = "";
+        if (fi % 3 == 0) msg += "fizz";
+        if (fi % 5 == 0) msg += "buzz";
+        await client.mutation.sendRoomChatMsg(format(`${fi} - ${msg}`));
+        await sleep(1000 / swarm.clients.length);
+        fi++;
       }
+    }
+
+    setInterval(
+      async () =>
+        await swarm.forEach((client) =>
+          client.mutation.sendRoomChatMsg(format("We did it boys!"))
+        ),
+      10000
+    );
   } catch (e) {
     log.fail();
+    console.error(e);
   }
 
   return death;
