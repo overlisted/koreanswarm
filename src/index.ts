@@ -6,6 +6,7 @@ import log from "./log";
 import { tokensToString } from "@dogehouse/kebab";
 import { writeFile, readFile } from "fs/promises";
 import ClientSwarm from "./ClientSwarm";
+import fizzBuzzName from "./fizzBuzzName";
 
 let kill: Function;
 let death: Promise<void> = new Promise((resolve) => (kill = resolve));
@@ -22,7 +23,7 @@ const main = async () => {
     log.load("Creating room");
 
     await swarm.createRoom({
-      name: "FizzBuzz 0 - 1 000 000 (do !speak to speak)",
+      name: fizzBuzzName(0),
       privacy: "public",
       description: "yes",
     });
@@ -51,7 +52,7 @@ const main = async () => {
 
     while (fi <= 1000000) {
       swarm.first.mutation.editRoom({
-        name: `FizzBuzz - ${fi} / 1 000 000 (do !speak to speak)`,
+        name: fizzBuzzName(0),
         privacy: "public",
         description: "yes",
       });
